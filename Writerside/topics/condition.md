@@ -16,11 +16,13 @@
 
 ## Props
 
-#### open, setOpen, handleSubmit, là các trường common trong các component popup dùng để hiển thị và ẩn popup, xử lý submit form.
+open, setOpen, handleSubmit, là các trường common trong các component popup dùng để hiển thị và ẩn popup, xử lý submit form.
 
-#### initialValue: giá trị ban đầu của form, dùng để hiển thị giá trị ban đầu của form. Thường là giá trị đã được lưu trước đó. (Trong màn edit)
+## initialValue
 
- - **Cấu trúc:**
+initialValue: giá trị ban đầu của form, dùng để hiển thị giá trị ban đầu của form. Thường là giá trị đã được lưu trước đó. (Trong màn edit)
+
+ - Cấu trúc:
 ```Typescript
   [
       <!-- Array: Nhóm điều kiện -->
@@ -180,4 +182,153 @@
   ],
 ]
 ```
+
+## declareObject
+
+
+ - Cấu trúc: Các giá trị newData, groupData giống với cấu trúc phía trên, nhưng có thêm các hàm xử lý trước và sau khi thêm, xóa điều kiện.
+ 
+`Lưu ý: groupData là mảng các điều kiện nên khi khai báo cần để dạng [{...}, ...]`
+
+```Typescript
+declareObject: {
+    delete?: {
+        beforeDelete?: (index: number, name: string | number | (string | number)[], form: FormInstance<any>) => void;
+        afterDelete?: (index: number, name: string | number | (string | number)[], form: FormInstance<any>) => void;
+    };
+    add?: {
+        beforeAdd?: (name: string | number | (string | number)[], form: FormInstance<any>) => void;
+        afterAdd?: (name: string | number | (string | number)[], form: FormInstance<any>) => void;
+        newData?: {
+            condition: {
+                type: 'select' | 'input';
+                options?: { value: string; label: string }[];
+                value?: string;
+                onChange?: (name: string | number | (string | number)[], form: FormInstance<any>, value: string, option: { value: string; label: string }) => void;
+            };
+            operator: {
+                ...
+            };
+            value: {
+                ...                
+            };
+        };
+        groupData?: {
+            condition: {
+                type: 'select' | 'input';
+                options?: { value: string; label: string }[];
+                value?: string;
+                onChange?: (name: string | number | (string | number)[], form: FormInstance<any>, value: string, option: { value: string; label: string }) => void;
+                {...props}: SelectProps;
+            };
+            operator: {
+                ...
+            };
+            value: {
+                ...                
+            };
+        }[];
+    };
+};
+```
+
+- Data example:
+```Typescript
+    export const declareObjectExample = {
+  add: {
+    beforeAdd: (name: any, form: any) => {
+      console.log('beforeAdd', name, form.getFieldsValue(true))
+    },
+    groupData: [
+      {
+        condition: {
+          type: 'select',
+          placeholder: 'Điều kiện BER',
+          options: [
+            { value: 'A', label: 'A' },
+            { value: 'B', label: 'B' },
+            { value: 'C', label: 'C' },
+          ],
+        },
+        operator: {
+          type: 'select',
+          placeholder: 'Toán tử',
+          options: [
+            { value: 'A', label: '=' },
+            { value: 'B', label: '<' },
+            { value: 'C', label: '>' },
+          ],
+        },
+        value: {
+          type: 'select',
+          placeholder: 'Giá trị',
+          options: [
+            { value: 'A', label: 'A' },
+            { value: 'B', label: 'B' },
+            { value: 'C', label: 'C' },
+          ],
+        },
+      },
+    ],
+    newData: {
+      condition: {
+        type: 'select',
+        options: [
+          {
+            value: 'A',
+            label: 'A',
+          },
+          {
+            value: 'B',
+            label: 'B',
+          },
+          {
+            value: 'C',
+            label: 'C',
+          },
+        ],
+        onChange: (name: any, form: any, value: any, option: any) => {
+          onChooseCondition(
+            {
+              operator: {
+                type: 'select',
+                placeholder: 'Toán tử !#!@#!',
+                options: [
+                  { value: 'A', label: '=' },
+                  { value: 'B', label: '<' },
+                  { value: 'C', label: '>' },
+                ],
+                onChange: (name: any, form: any, value: any, option: any) => {
+                  onChooseCondition(
+                    {
+                      condition: {
+                        value: 'C',
+                      },
+                      value: {
+                        type: 'select',
+                        placeholder: 'Giá trị',
+                      },
+                    },
+                    name,
+                    form,
+                    'MERGE',
+                  )
+                },
+              },
+              value: {},
+            },
+            name,
+            form,
+          )
+        },
+        placeholder: 'ASDAS',
+      },
+    },
+  },
+}
+```
+
+## Author
+
+[Đình Phúc](mailto: phucdd@vnpt-technology.vn)
 
