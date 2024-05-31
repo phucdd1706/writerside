@@ -4,8 +4,7 @@
 
 <instance-profile id="in"
                  name="Instance Name"
-                 start-page="starter.md">
+                 start-page="condition.md">
 
-    <toc-element topic="starter.md"/>
     <toc-element topic="condition.md"/>
 </instance-profile>
